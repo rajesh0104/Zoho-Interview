@@ -16,7 +16,7 @@
         android:theme="@style/Theme.Interview"
         tools:targetApi="31">
         <activity
-            android:name=".DashBoardActivity"
+            android:name="com.zoho.interview.dashboard.view.DashBoardActivityView"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
