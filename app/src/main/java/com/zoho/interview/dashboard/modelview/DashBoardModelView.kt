@@ -12,9 +12,9 @@ import retrofit2.Response
 
 class DashBoardModelView(var dashboardActivityInstance: DashBoardActivityView) {
 
-    fun getUserDetails(pageSize: Int) {
+    fun getUserDetails(itemSize: Int,pageNumber:Int) {
         val readUserDataApiRequest =
-            AppController().restClient?.restApiServices?.getUserDetails(pageSize)
+            AppController().restClient?.restApiServices?.getUserDetails(itemSize,pageNumber)
         readUserDataApiRequest?.enqueue(object : Callback<ApiData> {
             override fun onFailure(call: Call<ApiData>, t: Throwable) {
                 Log.e("failed", "api failed", t)
@@ -37,9 +37,7 @@ class DashBoardModelView(var dashboardActivityInstance: DashBoardActivityView) {
             val apiResultData = apiResults[i]
             val userDetails: User = User(
                 apiResultData.login?.username.toString(),
-                apiResultData.name?.title,
-                apiResultData.name?.first,
-                apiResultData.name?.last,
+                apiResultData.name?.first + " " + apiResultData.name?.last,
                 apiResultData.dob?.age,
                 apiResultData.email,
                 apiResultData.phone,

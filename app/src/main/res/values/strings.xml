@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Interview</string>
+    <string name="app_name">Weather App</string>
+    <string name="search_by_name_or_location">Search by name or location</string>
+    <string name="my_friends">My Friends</string>
 </resources>

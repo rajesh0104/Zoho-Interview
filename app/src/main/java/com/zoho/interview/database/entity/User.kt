@@ -11,14 +11,8 @@ data class User(
     @ColumnInfo(name = "user_id")
     var userId: String,
 
-    @ColumnInfo(name = "user_title")
-    var title: String?,
-
-    @ColumnInfo(name = "user_first_name")
-    var firstName: String?,
-
-    @ColumnInfo(name = "user_last_name")
-    var lastName: String?,
+    @ColumnInfo(name = "user_name")
+    var userName: String?,
 
     @ColumnInfo(name = "user_age")
     var age: Int?,

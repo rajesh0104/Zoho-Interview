@@ -15,4 +15,7 @@ interface UserDao {
 
     @Query(DatabaseConstant.TABLE_SELECT_FROM_QUERY + DatabaseConstant.TABLE_NAME_USER_DETAILS)
     fun getUserDetails(): List<User>?
+
+    @Query("SELECT * FROM USER_DETAILS WHERE user_name LIKE '%' || :searchedKey || '%'")
+    fun getCurrentUserSearchedDetails(searchedKey: String?): List<User>?
 }

@@ -7,5 +7,8 @@ import retrofit2.http.Query
 
 interface RestApiServices {
     @GET("api")
-    fun getUserDetails(@Query("results", encoded = true) dataSize: Int): Call<ApiData>
+    fun getUserDetails(
+        @Query("results", encoded = true) dataSize: Int,
+        @Query("page", encoded = true)  pageNumber: Int
+    ): Call<ApiData>
 }
