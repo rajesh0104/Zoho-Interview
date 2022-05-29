@@ -1,9 +1,12 @@
 package com.zoho.interview.rest.pogo
 
+import com.google.gson.annotations.SerializedName
 import java.util.*
 
 data class ApiData(
-    var results: List<ApiResults>?
+    var results: List<ApiResults>?,
+    var location: ApiResults.Location,
+    var current: CurrentWeatherData,
 ) {
     data class ApiResults(
         val name: Name?,
@@ -22,6 +25,9 @@ data class ApiData(
         )
 
         data class Location(
+            var name: String?,
+            var localtime: String?,
+            var region: String?,
             var city: String?,
             var state: String?,
             var country: String?,
@@ -48,6 +54,28 @@ data class ApiData(
         data class Picture(
             var medium: String?,
             var large: String?
+        )
+    }
+
+    data class CurrentWeatherData(
+        @SerializedName("temp_c")
+        var tempInCelsius: String,
+
+        @SerializedName("last_updated")
+        var lastUpdated: String,
+
+        @SerializedName("wind_kph")
+        var windSpeedInKmp: String,
+
+        @SerializedName("wind_dir")
+        var windDirection: String,
+
+        @SerializedName("condition")
+        var climateCondition: Condition
+    ) {
+        data class Condition(
+            var text: String,
+            var icon: String
         )
     }
 }

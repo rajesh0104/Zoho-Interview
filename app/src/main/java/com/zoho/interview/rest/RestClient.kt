@@ -1,6 +1,5 @@
 package com.zoho.interview.rest
 
-import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -9,9 +8,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-class RestClient(context: Context) {
+class RestClient(isLocation: Boolean) {
 
-    lateinit var restApiServices: RestApiServices
+    public var restApiServices: RestApiServices
 
     init {
         val client = OkHttpClient.Builder()
@@ -25,7 +24,13 @@ class RestClient(context: Context) {
             .build()
 
         val restAdapter = Retrofit.Builder()
-            .baseUrl("https://randomuser.me/")
+            .baseUrl(
+                if (isLocation) {
+                    "https://api.weatherapi.com/"
+                } else {
+                    "https://randomuser.me/"
+                }
+            )
             .client(client.build())
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()

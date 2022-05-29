@@ -18,4 +18,7 @@ interface UserDao {
 
     @Query("SELECT * FROM USER_DETAILS WHERE user_name LIKE '%' || :searchedKey || '%'")
     fun getCurrentUserSearchedDetails(searchedKey: String?): List<User>?
+
+    @Query("DELETE FROM USER_DETAILS")
+    fun deleteUserDetailsTable()
 }

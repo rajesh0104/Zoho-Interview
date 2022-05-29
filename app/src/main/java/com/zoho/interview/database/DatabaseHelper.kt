@@ -13,7 +13,13 @@ class DatabaseHelper {
         return AppDatabase.getInstance(activity).userDao().getUserDetails()
     }
 
-    fun getCurrentUserSearchedDetails(activity: Activity,searchedKey:String?): List<User>? {
-        return AppDatabase.getInstance(activity).userDao().getCurrentUserSearchedDetails(searchedKey)
+    fun getCurrentUserSearchedDetails(activity: Activity, searchedKey: String?): List<User>? {
+        return AppDatabase.getInstance(activity).userDao()
+            .getCurrentUserSearchedDetails(searchedKey)
+    }
+
+    fun deleteUserDetails(activity: Activity) {
+        AppDatabase.getInstance(activity).userDao()
+            .deleteUserDetailsTable()
     }
 }

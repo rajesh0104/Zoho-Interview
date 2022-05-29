@@ -9,50 +9,78 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
+import android.view.Gravity
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
+import androidx.transition.Slide
 import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.*
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
 import com.zoho.interview.R
-import com.zoho.interview.dashboard.modelview.DashBoardModelView
-import com.zoho.interview.database.DatabaseHelper
 import com.zoho.interview.databinding.ActivityDashBoardBinding
 
 
-class DashBoardActivityView : AppCompatActivity(), TextWatcher, LocationListener {
+class DashBoardActivityView : AppCompatActivity(), View.OnClickListener,
+    LocationListener {
 
     private lateinit var dashBoardBinding: ActivityDashBoardBinding
-    private lateinit var dashBoardModelView: DashBoardModelView
-    private lateinit var adapter: DashBoardAdapter
+    private lateinit var userDetailsFragment: UserDetailsFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dashBoardBinding = DataBindingUtil.setContentView(
             this, R.layout.activity_dash_board
         )
-        dashBoardModelView = DashBoardModelView(this)
-        dashBoardBinding.rvUserList.setItemViewCacheSize(50)
-        dashBoardBinding.etSearch.addTextChangedListener(this)
-        dashBoardBinding.rvUserList.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        adapter = DashBoardAdapter(
-            this, ArrayList()
-        )
-        dashBoardBinding.rvUserList.adapter = adapter
-        dashBoardModelView.getUserDetails(20, 1)
+
+        dashBoardBinding.clLocationUpdation.setOnClickListener(this)
+        userDetailsFragment = UserDetailsFragment()
+        addChildFragment(userDetailsFragment)
         getLocationPermission()
+    }
+
+
+    override fun onClick(view: View?) {
+        if (view?.id == R.id.cl_location_updation) {
+            getLocationPermission()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 101 && resultCode == RESULT_OK) {
             getLocationPermission()
+        } else if (requestCode == 101) {
+            dashBoardBinding.tvUserLocation.text = "Click to update weather"
         }
+    }
+
+
+    fun addChildFragment(fragment: Fragment) {
+        val manager: FragmentManager = supportFragmentManager
+        val transaction: FragmentTransaction = manager.beginTransaction()
+        val animFragment: Fragment
+        if (fragment is UserDetailsFragment) {
+            // No need any animation because this is the launcher fragment
+            animFragment = fragment.apply {
+
+            }
+        } else {
+            animFragment = fragment.apply {
+                enterTransition = Slide(Gravity.END)
+                exitTransition = Slide(Gravity.START)
+            }
+        }
+
+        transaction.add(R.id.fl_child_fragment, animFragment, fragment::class.java.simpleName)
+        transaction.addToBackStack(fragment::class.java.simpleName)
+        transaction.commitAllowingStateLoss()
     }
 
     override fun onRequestPermissionsResult(
@@ -65,31 +93,6 @@ class DashBoardActivityView : AppCompatActivity(), TextWatcher, LocationListener
             getLocationPermission()
         }
     }
-
-    fun onUserDetailsUpdated() {
-        val userList = DatabaseHelper().getCurrentUserDetails(this)
-        adapter.updateData(userList)
-    }
-
-    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-    }
-
-    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-        val userList = DatabaseHelper().getCurrentUserSearchedDetails(this, p0.toString())
-        adapter.updateSearchedData(userList)
-
-        if (p0?.length == 0) {
-            val allUserList = DatabaseHelper().getCurrentUserDetails(this)
-            adapter.updateData(allUserList)
-        }
-        Log.d("TYPING_TEXT::", userList?.size.toString())
-    }
-
-    override fun afterTextChanged(p0: Editable?) {
-
-    }
-
 
     private fun getLocationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -109,6 +112,7 @@ class DashBoardActivityView : AppCompatActivity(), TextWatcher, LocationListener
 
 
     private fun buildGoogleApiClient() {
+        dashBoardBinding.tvUserLocation.text = "Updating location details"
         val locationRequest = LocationRequest.create()
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
@@ -121,28 +125,19 @@ class DashBoardActivityView : AppCompatActivity(), TextWatcher, LocationListener
         task.addOnSuccessListener { response ->
             val states = response.locationSettingsStates
             if (states?.isLocationPresent == true) {
-                val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+                val locationManager =
+                    getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
                 if (ActivityCompat.checkSelfPermission(
                         this,
                         Manifest.permission.ACCESS_FINE_LOCATION
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
-                    val location: Location? =
-                        locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-                    if (location != null) {
-                        Log.d(
-                            "CURRENT_LOCATION::",
-                            location.latitude.toString() + "::" + location.longitude
-                        )
-                    } else {
-                        locationManager.requestLocationUpdates(
-                            LocationManager.NETWORK_PROVIDER,
-                            0,
-                            0f,
-                            this@DashBoardActivityView
-                        )
-                    }
+                    locationManager.requestLocationUpdates(
+                        LocationManager.NETWORK_PROVIDER,
+                        0,
+                        0f,
+                        this@DashBoardActivityView
+                    )
                 }
             }
         }
@@ -159,8 +154,14 @@ class DashBoardActivityView : AppCompatActivity(), TextWatcher, LocationListener
         }
     }
 
+
     override fun onLocationChanged(location: Location) {
         Log.d("CURRENT_LOCATION::", location.latitude.toString() + "::" + location.longitude)
-
+        if (userDetailsFragment.isVisible) {
+            userDetailsFragment.getUserWeatherDetails(
+                location.latitude.toString() + "," + location.longitude,
+                dashBoardBinding.tvUserLocation
+            )
+        }
     }
 }

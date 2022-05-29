@@ -16,15 +16,14 @@ class AppController : Application() {
         private set
 
     var restClient: RestClient? = null
-        get() {
-            if (field == null) {
-                this.restClient = RestClient(this)
-            }
-            return field
-        }
-        private set
+
 
     override fun onCreate() {
         super.onCreate()
+    }
+
+    fun restClient(isLocationService: Boolean): RestClient {
+        this.restClient = RestClient(isLocationService)
+        return restClient as RestClient
     }
 }

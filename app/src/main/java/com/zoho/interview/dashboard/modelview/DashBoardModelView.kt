@@ -4,18 +4,19 @@ import android.util.Log
 import com.zoho.interview.AppController
 import com.zoho.interview.rest.pogo.ApiData
 import com.zoho.interview.dashboard.view.DashBoardActivityView
+import com.zoho.interview.dashboard.view.UserDetailsFragment
 import com.zoho.interview.database.DatabaseHelper
 import com.zoho.interview.database.entity.User
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class DashBoardModelView(var dashboardActivityInstance: DashBoardActivityView) {
+class DashBoardModelView(var dashboardActivityInstance: UserDetailsFragment) {
 
-    fun getUserDetails(itemSize: Int,pageNumber:Int) {
+    fun getUserDetails(itemSize: Int, pageNumber: Int) {
         val readUserDataApiRequest =
-            AppController().restClient?.restApiServices?.getUserDetails(itemSize,pageNumber)
-        readUserDataApiRequest?.enqueue(object : Callback<ApiData> {
+            AppController().restClient(false).restApiServices.getUserDetails(itemSize, pageNumber)
+        readUserDataApiRequest.enqueue(object : Callback<ApiData> {
             override fun onFailure(call: Call<ApiData>, t: Throwable) {
                 Log.e("failed", "api failed", t)
             }
@@ -25,6 +26,27 @@ class DashBoardModelView(var dashboardActivityInstance: DashBoardActivityView) {
                 response: Response<ApiData>
             ) {
                 onUserDetailsApiSuccess(response.body()?.results)
+            }
+        })
+    }
+
+
+    fun getUserWeatherDetails(latLong: String) {
+        val weatherApiRequest =
+            AppController().restClient(true).restApiServices.getCurrentUserWeatherDetails(
+                "5d0fda94b91f49f7b7961010222905",
+                latLong
+            )
+        weatherApiRequest.enqueue(object : Callback<ApiData> {
+            override fun onFailure(call: Call<ApiData>, t: Throwable) {
+                Log.e("failed", "api failed", t)
+            }
+
+            override fun onResponse(
+                call: Call<ApiData>,
+                response: Response<ApiData>
+            ) {
+                apiResponseWeather(response.body()?.location, response.body()?.current)
             }
         })
     }
@@ -45,12 +67,19 @@ class DashBoardModelView(var dashboardActivityInstance: DashBoardActivityView) {
                 apiResultData.picture?.large,
                 apiResultData.location?.state,
                 apiResultData.location?.country,
-                apiResultData.location?.coordinates?.latitude,
                 apiResultData.location?.coordinates?.longitude,
+                apiResultData.location?.coordinates?.latitude
             )
             userList.add(userDetails)
         }
-        DatabaseHelper().storeUserDetails(dashboardActivityInstance, userList)
+        dashboardActivityInstance.activity?.let { DatabaseHelper().storeUserDetails(it, userList) }
         dashboardActivityInstance.onUserDetailsUpdated()
+    }
+
+    private fun apiResponseWeather(
+        results: ApiData.ApiResults.Location?,
+        current: ApiData.CurrentWeatherData?
+    ) {
+        dashboardActivityInstance.onUserWeatherDetailsUpdated(results, current)
     }
 }
