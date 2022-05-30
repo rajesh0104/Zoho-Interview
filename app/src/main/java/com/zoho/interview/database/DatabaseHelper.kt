@@ -18,6 +18,10 @@ class DatabaseHelper {
         return AppDatabase.getInstance(activity).userDao().getUserDetails()
     }
 
+    fun getCurrentUserDetails(activity: Activity,limits:Int, pageNumber: Int): List<User>? {
+        return AppDatabase.getInstance(activity).userDao().getUserDetails(limits,pageNumber)
+    }
+
     fun getCurrentUserSearchedDetails(activity: Activity, searchedKey: String?): List<User>? {
         return AppDatabase.getInstance(activity).userDao()
             .getCurrentUserSearchedDetails(searchedKey)

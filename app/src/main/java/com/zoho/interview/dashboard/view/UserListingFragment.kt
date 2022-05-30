@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +11,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.zoho.interview.IPagination
 import com.zoho.interview.R
 import com.zoho.interview.dashboard.modelview.DashBoardModelView
 import com.zoho.interview.dashboard.view.DashBoardActivityView.Companion.currentUserAddressFromLocation
@@ -21,14 +21,16 @@ import com.zoho.interview.databinding.FragmentUserListBinding
 import com.zoho.interview.helper.AppHelper
 import com.zoho.interview.rest.pogo.ApiData
 
-class UserListingFragment : Fragment(), TextWatcher, View.OnClickListener {
+class UserListingFragment : Fragment(), TextWatcher, View.OnClickListener, IPagination {
 
     private lateinit var fragmentUserListBinding: FragmentUserListBinding
     private lateinit var dashBoardModelView: DashBoardModelView
-    private lateinit var adapter: DashBoardAdapter
+    private lateinit var adapter: UserListingAdapter
     private lateinit var locationTextView: TextView
     private var onClickFragment: AppHelper.OnClickFragment? = null
     private var userLocation: String = ""
+    private var pageNumber: Int = 1
+    private var contentLimit: Int = 20
 
 
     override fun onCreateView(
@@ -51,8 +53,8 @@ class UserListingFragment : Fragment(), TextWatcher, View.OnClickListener {
         fragmentUserListBinding.ivSearch.setOnClickListener(this)
         fragmentUserListBinding.rvUserList.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-        adapter = DashBoardAdapter(
-            requireActivity(), ArrayList(), onClickFragment
+        adapter = UserListingAdapter(
+            requireActivity(), ArrayList(), onClickFragment, this
         )
         fragmentUserListBinding.rvUserList.adapter = adapter
         DatabaseHelper().deleteUserDetails(requireActivity())
@@ -72,7 +74,7 @@ class UserListingFragment : Fragment(), TextWatcher, View.OnClickListener {
             "80.1688473", 0
         )
         DatabaseHelper().storeUserDetails(requireActivity(), userDetails)
-        dashBoardModelView.getUserDetails(10, 1)
+        dashBoardModelView.getUserDetails(contentLimit, pageNumber)
     }
 
     override fun onClick(view: View?) {
@@ -86,14 +88,21 @@ class UserListingFragment : Fragment(), TextWatcher, View.OnClickListener {
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
         val userList =
             DatabaseHelper().getCurrentUserSearchedDetails(requireActivity(), p0.toString())
-        adapter.updateSearchedData(userList)
-
         if (p0?.length == 0) {
             val allUserList = DatabaseHelper().getCurrentUserDetails(requireActivity())
             adapter.updateData(allUserList)
             fragmentUserListBinding.ivSearch.setImageDrawable(resources.getDrawable(android.R.drawable.ic_menu_search))
         } else {
             fragmentUserListBinding.ivSearch.setImageDrawable(resources.getDrawable(android.R.drawable.ic_menu_close_clear_cancel))
+        }
+
+        if (userList?.isEmpty() == true) {
+            fragmentUserListBinding.emptyView.visibility = View.VISIBLE
+            fragmentUserListBinding.rvUserList.visibility = View.GONE
+        } else {
+            adapter.updateSearchedData(userList)
+            fragmentUserListBinding.emptyView.visibility = View.GONE
+            fragmentUserListBinding.rvUserList.visibility = View.VISIBLE
         }
     }
 
@@ -115,9 +124,9 @@ class UserListingFragment : Fragment(), TextWatcher, View.OnClickListener {
 
     }
 
-
     fun onUserDetailsUpdated() {
-        val userList = DatabaseHelper().getCurrentUserDetails(requireActivity())
+        val userList =
+            DatabaseHelper().getCurrentUserDetails(requireActivity(), contentLimit, pageNumber - 1)
         adapter.updateData(userList)
     }
 
@@ -154,5 +163,12 @@ class UserListingFragment : Fragment(), TextWatcher, View.OnClickListener {
         } catch (e: Exception) {
 
         }
+    }
+
+    override fun onPaginate() {
+        if (fragmentUserListBinding.etSearch.text.isEmpty()) {
+            dashBoardModelView.getUserDetails(contentLimit, pageNumber)
+        }
+        pageNumber += 1
     }
 }

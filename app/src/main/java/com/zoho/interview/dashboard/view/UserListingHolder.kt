@@ -11,7 +11,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.zoho.interview.R
 import com.zoho.interview.database.entity.User
 
-class DashBoardHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class UserListingHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private var mProfilePicture: ImageView? = null
     private var mUserName: TextView? = null
     private var mUserMailId: TextView? = null

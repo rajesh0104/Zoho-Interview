@@ -19,6 +19,9 @@ interface UserDao {
     @Query(DatabaseConstant.TABLE_SELECT_FROM_QUERY + DatabaseConstant.TABLE_NAME_USER_DETAILS + " WHERE is_user_active = 1")
     fun getUserDetails(): List<User>?
 
+    @Query("SELECT * FROM USER_DETAILS WHERE is_user_active = 1 LIMIT :limit OFFSET :pageNumber")
+    fun getUserDetails(limit: Int, pageNumber: Int): List<User>?
+
     @Query("SELECT * FROM USER_DETAILS  WHERE is_user_active = 1 AND user_name LIKE '%' || :searchedKey || '%'")
     fun getCurrentUserSearchedDetails(searchedKey: String?): List<User>?
 
