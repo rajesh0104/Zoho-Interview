@@ -45,20 +45,7 @@ App workflow
 
 Table name: USER_DETAILS
 
-user_id(primary key)
-gender
-user_name
-user_age
-user_mail_id
-user_mobile_number
-postal_code
-user_profile_picture_medium
-user_profile_picture_large
-user_state
-user_country
-user_coordination_latitude
-user_coordination_longitude
-is_user_active
+![](app/src/main/res/drawable/database_diagram.png)
 
 The above fields are used in the table
 
