@@ -189,10 +189,10 @@ class DashBoardActivityView : AppCompatActivity(), View.OnClickListener,
 
     override fun onLocationChanged(location: Location) {
         Log.d("CURRENT_LOCATION::", location.latitude.toString() + "::" + location.longitude)
-//        userListingFragment.getUserWeatherDetails(
-//            location.latitude.toString() + "," + location.longitude,
-//            dashBoardBinding.tvUserLocation
-//        )
+        userListingFragment.getUserWeatherDetails(
+            location.latitude.toString() + "," + location.longitude,
+            dashBoardBinding.tvUserLocation
+        )
     }
 
     override fun onUserDetailPageClicked(userLocation: String, userId: String) {
