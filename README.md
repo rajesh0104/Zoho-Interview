@@ -6,6 +6,12 @@ CONTUS Support Interactive (P) Ltd
 
 As Interview scheduled I have developed the Weather App by given requirement
 Requirement as below
+
+APK and Downloadable APK details
+
+1. Video prototype: https://youtu.be/uV5GSl--UPU
+2. Downloading APK link: https://github.com/rajesh0104/Zoho-Interview/raw/master/Zoho%20interview%20apk.apk
+
 Your App needs to contain 2 screens,
 
 Phase 1:
