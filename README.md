@@ -43,6 +43,8 @@ App workflow
 1. On home page, api randomuser has been integrated to list the user details
 2. From that api, I have saved the basic user details in table. Table structure below
 
+![](app/src/main/res/drawable/zoho_interview_app_sequence_diagram.png)
+
 Table name: USER_DETAILS
 
 ![](app/src/main/res/drawable/database_diagram.png)
