@@ -11,6 +11,9 @@ data class User(
     @ColumnInfo(name = "user_id")
     var userId: String,
 
+    @ColumnInfo(name = "gender")
+    var gender: String?,
+
     @ColumnInfo(name = "user_name")
     var userName: String?,
 
@@ -22,6 +25,9 @@ data class User(
 
     @ColumnInfo(name = "user_mobile_number")
     var mobileNumber: String?,
+
+    @ColumnInfo(name = "postal_code")
+    var postalCode: String?,
 
     @ColumnInfo(name = "user_profile_picture_medium")
     var medium: String?,
@@ -39,5 +45,8 @@ data class User(
     var latitude: String?,
 
     @ColumnInfo(name = "user_coordination_longitude")
-    var longitude: String?
+    var longitude: String?,
+
+    @ColumnInfo(name = "is_user_active")
+    var userActiveState: Int?
 )

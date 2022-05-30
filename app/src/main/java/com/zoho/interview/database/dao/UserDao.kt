@@ -13,12 +13,18 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertUserDetails(userDetails: List<User>?);
 
-    @Query(DatabaseConstant.TABLE_SELECT_FROM_QUERY + DatabaseConstant.TABLE_NAME_USER_DETAILS)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertUserDetails(userDetails: User?);
+
+    @Query(DatabaseConstant.TABLE_SELECT_FROM_QUERY + DatabaseConstant.TABLE_NAME_USER_DETAILS + " WHERE is_user_active = 1")
     fun getUserDetails(): List<User>?
 
-    @Query("SELECT * FROM USER_DETAILS WHERE user_name LIKE '%' || :searchedKey || '%'")
+    @Query("SELECT * FROM USER_DETAILS  WHERE is_user_active = 1 AND user_name LIKE '%' || :searchedKey || '%'")
     fun getCurrentUserSearchedDetails(searchedKey: String?): List<User>?
 
     @Query("DELETE FROM USER_DETAILS")
     fun deleteUserDetailsTable()
+
+    @Query("SELECT * FROM USER_DETAILS WHERE user_id =:userId")
+    fun getSelectedUserDetails(userId: String): User
 }

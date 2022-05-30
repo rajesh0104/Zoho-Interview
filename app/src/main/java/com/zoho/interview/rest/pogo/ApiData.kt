@@ -9,6 +9,7 @@ data class ApiData(
     var current: CurrentWeatherData,
 ) {
     data class ApiResults(
+        val gender: String?,
         val name: Name?,
         val location: Location?,
         val email: String?,
@@ -70,8 +71,16 @@ data class ApiData(
         @SerializedName("wind_dir")
         var windDirection: String,
 
+        @SerializedName("pressure_mb")
+        var windPressure: String,
+
+        @SerializedName("wind_mph")
+        var windSpeed: String,
+
         @SerializedName("condition")
-        var climateCondition: Condition
+        var climateCondition: Condition,
+        var cloud: Int,
+        var humidity: String
     ) {
         data class Condition(
             var text: String,

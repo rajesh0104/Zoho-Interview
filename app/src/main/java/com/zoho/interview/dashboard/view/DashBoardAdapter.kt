@@ -6,9 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.zoho.interview.R
 import com.zoho.interview.database.entity.User
+import com.zoho.interview.helper.AppHelper
 
 class DashBoardAdapter(
-    private val activity: Activity, private val data: ArrayList<User>
+    private val activity: Activity,
+    private val data: ArrayList<User>,
+    private val onClickFragment: AppHelper.OnClickFragment?
 ) : RecyclerView.Adapter<DashBoardHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DashBoardHolder {
         return DashBoardHolder(
@@ -19,6 +22,12 @@ class DashBoardAdapter(
 
     override fun onBindViewHolder(holder: DashBoardHolder, position: Int) {
         holder.bind(activity, data[position])
+        holder.itemView.setOnClickListener {
+            onClickFragment?.onUserDetailPageClicked(
+                data[position].latitude + "," + data[position].longitude,
+                data[position].userId
+            )
+        }
     }
 
     override fun getItemCount(): Int {

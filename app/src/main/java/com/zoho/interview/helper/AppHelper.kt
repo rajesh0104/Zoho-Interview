@@ -15,4 +15,8 @@ class AppHelper {
         val date: Date? = inputFormat.parse(currentDate.toString())
         return outputFormat.format(date)
     }
+
+    interface OnClickFragment {
+        fun onUserDetailPageClicked(location: String, userId: String)
+    }
 }

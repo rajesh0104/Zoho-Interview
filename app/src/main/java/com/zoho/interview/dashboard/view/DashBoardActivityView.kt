@@ -19,19 +19,28 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.transition.Slide
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.zoho.interview.R
+import com.zoho.interview.database.DatabaseHelper
 import com.zoho.interview.databinding.ActivityDashBoardBinding
+import com.zoho.interview.helper.AppHelper
+import com.zoho.interview.userdetails.view.UserDetailPageFragment
 
 
 class DashBoardActivityView : AppCompatActivity(), View.OnClickListener,
-    LocationListener {
+    LocationListener, AppHelper.OnClickFragment {
 
     private lateinit var dashBoardBinding: ActivityDashBoardBinding
-    private lateinit var userDetailsFragment: UserDetailsFragment
+    private lateinit var userListingFragment: UserListingFragment
+
+    companion object {
+        var currentUserAddressFromLocation = ""
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,9 +49,16 @@ class DashBoardActivityView : AppCompatActivity(), View.OnClickListener,
         )
 
         dashBoardBinding.clLocationUpdation.setOnClickListener(this)
-        userDetailsFragment = UserDetailsFragment()
-        addChildFragment(userDetailsFragment)
+        dashBoardBinding.ivProfilePicture.setOnClickListener(this)
+        userListingFragment = UserListingFragment()
+        addChildFragment(userListingFragment)
         getLocationPermission()
+
+        Glide.with(this)
+            .load(R.drawable.ic_my_self)
+            .apply(RequestOptions.circleCropTransform())
+            .thumbnail(0.1f)
+            .into(dashBoardBinding.ivProfilePicture)
     }
 
 
@@ -61,12 +77,28 @@ class DashBoardActivityView : AppCompatActivity(), View.OnClickListener,
         }
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.fl_child_fragment)
 
-    fun addChildFragment(fragment: Fragment) {
+        if (currentFragment is UserListingFragment) {
+            dashBoardBinding.tvUserLocation.text =
+                currentUserAddressFromLocation
+            Glide.with(this)
+                .load(R.drawable.ic_my_self)
+                .apply(RequestOptions.circleCropTransform())
+                .thumbnail(0.1f)
+                .into(dashBoardBinding.ivProfilePicture)
+        } else {
+            finish()
+        }
+    }
+
+    private fun addChildFragment(fragment: Fragment) {
         val manager: FragmentManager = supportFragmentManager
         val transaction: FragmentTransaction = manager.beginTransaction()
         val animFragment: Fragment
-        if (fragment is UserDetailsFragment) {
+        if (fragment is UserListingFragment) {
             // No need any animation because this is the launcher fragment
             animFragment = fragment.apply {
 
@@ -157,11 +189,30 @@ class DashBoardActivityView : AppCompatActivity(), View.OnClickListener,
 
     override fun onLocationChanged(location: Location) {
         Log.d("CURRENT_LOCATION::", location.latitude.toString() + "::" + location.longitude)
-        if (userDetailsFragment.isVisible) {
-            userDetailsFragment.getUserWeatherDetails(
-                location.latitude.toString() + "," + location.longitude,
-                dashBoardBinding.tvUserLocation
-            )
+//        userListingFragment.getUserWeatherDetails(
+//            location.latitude.toString() + "," + location.longitude,
+//            dashBoardBinding.tvUserLocation
+//        )
+    }
+
+    override fun onUserDetailPageClicked(userLocation: String, userId: String) {
+        UserDetailPageFragment.newInstance(userLocation, userId)?.let { addChildFragment(it) }
+        val selectedUserDetails = DatabaseHelper().getSelectedUserDetails(this, userId)
+        dashBoardBinding.tvUserLocation.text =
+            selectedUserDetails.state + "," + selectedUserDetails.country
+
+        if (selectedUserDetails.medium?.isEmpty() == true) {
+            Glide.with(this)
+                .load(R.drawable.ic_my_self)
+                .apply(RequestOptions.circleCropTransform())
+                .thumbnail(0.1f)
+                .into(dashBoardBinding.ivProfilePicture)
+        } else {
+            Glide.with(this)
+                .load(selectedUserDetails.medium)
+                .apply(RequestOptions.circleCropTransform())
+                .thumbnail(0.1f)
+                .into(dashBoardBinding.ivProfilePicture)
         }
     }
 }

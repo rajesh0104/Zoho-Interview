@@ -5,12 +5,16 @@
       <map>
         <entry key="app/src/main/res/drawable/ic_card_background.xml" value="0.1015" />
         <entry key="app/src/main/res/drawable/ic_card_location.xml" value="0.1015" />
+        <entry key="app/src/main/res/drawable/ic_detail_page_weather.xml" value="0.1015" />
         <entry key="app/src/main/res/drawable/ic_home_location_background.xml" value="0.1015" />
+        <entry key="app/src/main/res/drawable/ic_horizontal_line.xml" value="0.1015" />
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.1015" />
         <entry key="app/src/main/res/drawable/ic_search_background.xml" value="0.1015" />
         <entry key="app/src/main/res/layout/activity_dash_board.xml" value="0.23736600306278713" />
         <entry key="app/src/main/res/layout/adapter_dashboard.xml" value="0.14" />
+        <entry key="app/src/main/res/layout/fragment_user_detail_page.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_user_details.xml" value="0.12083333333333333" />
+        <entry key="app/src/main/res/layout/fragment_user_list.xml" value="0.121875" />
       </map>
     </option>
   </component>
